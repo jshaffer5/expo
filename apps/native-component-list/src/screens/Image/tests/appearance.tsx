@@ -1,3 +1,4 @@
+import { images } from '../images';
 import { ImageTestGroup, ImageTestPropsFnInput } from '../types';
 import { tintColor, tintColor2 } from './constants';
 
@@ -63,21 +64,67 @@ const imageTests: ImageTestGroup = {
       }),
     },
     {
-      name: 'Border radius',
+      name: 'Border style: Dotted',
       props: ({ range }: ImageTestPropsFnInput) => ({
         style: {
-          borderRadius: range(0, 100),
+          borderWidth: range(0, 50),
+          borderColor: tintColor,
+          borderStyle: 'dotted',
+        },
+      }),
+    },
+    {
+      name: 'Border style: Dashed',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          borderWidth: range(0, 50),
+          borderColor: tintColor,
+          borderStyle: 'dashed',
+        },
+      }),
+    },
+    {
+      name: 'Border style: Dotted & rounded',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          borderWidth: range(0, 50),
+          borderColor: tintColor,
+          borderStyle: 'dotted',
+          borderRadius: range(0, 50),
+        },
+      }),
+    },
+    {
+      name: 'Border style: Dashed & rounded',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          borderWidth: range(0, 50),
+          borderColor: tintColor,
+          borderStyle: 'dashed',
+          borderRadius: range(0, 50),
+        },
+      }),
+    },
+    {
+      name: 'Border radius',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        source: images.require_jpg1,
+        style: {
+          borderRadius: range(0, 200),
+          borderWidth: 10,
+          borderColor: tintColor,
         },
       }),
     },
     {
       name: 'Border radius: separate corners',
       props: ({ range }: ImageTestPropsFnInput) => ({
+        source: images.require_jpg1,
         style: {
           borderTopLeftRadius: range(0, 25),
           borderTopRightRadius: range(0, 50),
           borderBottomLeftRadius: range(0, 75),
-          borderBottomRightRadius: range(0, 100),
+          borderBottomRightRadius: range(0, 200),
           borderWidth: 5,
           borderColor: tintColor,
         },
@@ -135,6 +182,41 @@ const imageTests: ImageTestGroup = {
           shadowOpacity: range(0.2, 0.5),
           shadowRadius: range(0, 10),
           elevation: range(0, 10),
+        },
+      }),
+    },
+    {
+      name: 'Shadow: and border-radius',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          borderRadius: range(0, 100),
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: range(2, 5),
+          },
+          shadowOpacity: range(0.2, 0.5),
+          shadowRadius: range(0, 10),
+          elevation: range(0, 10),
+        },
+      }),
+    },
+    {
+      name: 'Shadow: and separate border-radius',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          borderTopLeftRadius: range(0, 25),
+          borderTopRightRadius: range(0, 50),
+          borderBottomLeftRadius: range(0, 75),
+          borderBottomRightRadius: range(0, 200),
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 5,
+          },
+          shadowOpacity: 0.5,
+          shadowRadius: 10,
+          elevation: 10,
         },
       }),
     },
