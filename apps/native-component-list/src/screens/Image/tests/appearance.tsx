@@ -1,6 +1,5 @@
-import { images } from '../images';
 import { ImageTestGroup, ImageTestPropsFnInput } from '../types';
-import { tintColor, tintColor2 } from './constants';
+import { tintColor } from './constants';
 
 const imageTests: ImageTestGroup = {
   name: 'Appearance',
@@ -45,107 +44,6 @@ const imageTests: ImageTestGroup = {
         blurRadius: range(0, 60),
       }),
     },
-    {
-      name: 'Border color',
-      props: {
-        style: {
-          borderWidth: 5,
-          borderColor: tintColor,
-        },
-      },
-    },
-    {
-      name: 'Border width',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        style: {
-          borderWidth: range(0, 20),
-          borderColor: tintColor,
-        },
-      }),
-    },
-    {
-      name: 'Border style: Dotted',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        style: {
-          borderWidth: range(0, 50),
-          borderColor: tintColor,
-          borderStyle: 'dotted',
-        },
-      }),
-    },
-    {
-      name: 'Border style: Dashed',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        style: {
-          borderWidth: range(0, 50),
-          borderColor: tintColor,
-          borderStyle: 'dashed',
-        },
-      }),
-    },
-    {
-      name: 'Border style: Dotted & rounded',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        style: {
-          borderWidth: range(0, 50),
-          borderColor: tintColor,
-          borderStyle: 'dotted',
-          borderRadius: range(0, 50),
-        },
-      }),
-    },
-    {
-      name: 'Border style: Dashed & rounded',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        style: {
-          borderWidth: range(0, 50),
-          borderColor: tintColor,
-          borderStyle: 'dashed',
-          borderRadius: range(0, 50),
-        },
-      }),
-    },
-    {
-      name: 'Border radius',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        source: images.require_jpg1,
-        style: {
-          borderRadius: range(0, 200),
-          borderWidth: 10,
-          borderColor: tintColor,
-        },
-      }),
-    },
-    {
-      name: 'Border radius: separate corners',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        source: images.require_jpg1,
-        style: {
-          borderTopLeftRadius: range(0, 25),
-          borderTopRightRadius: range(0, 50),
-          borderBottomLeftRadius: range(0, 75),
-          borderBottomRightRadius: range(0, 200),
-          borderWidth: 5,
-          borderColor: tintColor,
-        },
-      }),
-    },
-    {
-      name: 'Borders: separate edges',
-      props: ({ range }: ImageTestPropsFnInput) => ({
-        style: {
-          borderLeftWidth: range(0, 25),
-          borderLeftColor: tintColor,
-          borderTopWidth: range(0, 25),
-          borderTopColor: tintColor2,
-          borderRightWidth: range(0, 25),
-          borderRightColor: tintColor,
-          borderBottomWidth: range(0, 25),
-          borderBottomColor: tintColor2,
-        },
-      }),
-    },
-
     {
       name: 'Opacity',
       props: ({ range }: ImageTestPropsFnInput) => ({
