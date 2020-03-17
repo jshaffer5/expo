@@ -24,6 +24,23 @@ const imageTests: ImageTestGroup = {
       }),
     },
     {
+      name: 'Border and shadows',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          borderWidth: range(0, 20),
+          borderColor: tintColor,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 5,
+          },
+          shadowOpacity: 0.5,
+          shadowRadius: 10,
+          elevation: 10,
+        },
+      }),
+    },
+    {
       name: 'Border radius',
       props: ({ range }: ImageTestPropsFnInput) => ({
         style: {
