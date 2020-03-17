@@ -52,6 +52,12 @@ const imageTests: ImageTestGroup = {
         source: images.uri_ico,
       },
     },
+    {
+      name: `uri:.svg`,
+      props: {
+        source: images.uri_svg,
+      },
+    },
   ],
 };
 
