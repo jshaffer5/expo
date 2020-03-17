@@ -2,10 +2,20 @@
 
 #import <expo-image/EXImageViewManager.h>
 #import <expo-image/EXImageView.h>
+#import <SDWebImageSVGKitPlugin/SDImageSVGKCoder.h>
+#import <SDWebImage/SDImageCodersManager.h>
 
 @implementation EXImageViewManager
 
 RCT_EXPORT_MODULE(ExpoImage)
+
++ (void)initialize
+{
+  SDImageSVGKCoder *svgCoder = [SDImageSVGKCoder sharedCoder];
+  if (![[SDImageCodersManager sharedManager].coders containsObject:svgCoder]) {
+    [[SDImageCodersManager sharedManager] addCoder:svgCoder];
+  }
+}
 
 RCT_EXPORT_VIEW_PROPERTY(source, NSDictionary)
 
