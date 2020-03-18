@@ -15,15 +15,15 @@
 /**
  * Border radii.
  */
-@property (nonatomic, assign) CGFloat borderRadius;
-@property (nonatomic, assign) CGFloat borderTopLeftRadius;
-@property (nonatomic, assign) CGFloat borderTopRightRadius;
-@property (nonatomic, assign) CGFloat borderTopStartRadius;
-@property (nonatomic, assign) CGFloat borderTopEndRadius;
-@property (nonatomic, assign) CGFloat borderBottomLeftRadius;
-@property (nonatomic, assign) CGFloat borderBottomRightRadius;
-@property (nonatomic, assign) CGFloat borderBottomStartRadius;
-@property (nonatomic, assign) CGFloat borderBottomEndRadius;
+@property (nonatomic, copy) NSNumber *borderRadius;
+@property (nonatomic, copy) NSNumber *borderTopLeftRadius;
+@property (nonatomic, copy) NSNumber *borderTopRightRadius;
+@property (nonatomic, copy) NSNumber *borderTopStartRadius;
+@property (nonatomic, copy) NSNumber *borderTopEndRadius;
+@property (nonatomic, copy) NSNumber *borderBottomLeftRadius;
+@property (nonatomic, copy) NSNumber *borderBottomRightRadius;
+@property (nonatomic, copy) NSNumber *borderBottomStartRadius;
+@property (nonatomic, copy) NSNumber *borderBottomEndRadius;
 
 /**
  * Border colors (actually retained).
@@ -39,13 +39,13 @@
 /**
  * Border widths.
  */
-@property (nonatomic, assign) CGFloat borderTopWidth;
-@property (nonatomic, assign) CGFloat borderRightWidth;
-@property (nonatomic, assign) CGFloat borderBottomWidth;
-@property (nonatomic, assign) CGFloat borderLeftWidth;
-@property (nonatomic, assign) CGFloat borderStartWidth;
-@property (nonatomic, assign) CGFloat borderEndWidth;
-@property (nonatomic, assign) CGFloat borderWidth;
+@property (nonatomic, copy) NSNumber *borderTopWidth;
+@property (nonatomic, copy) NSNumber *borderRightWidth;
+@property (nonatomic, copy) NSNumber *borderBottomWidth;
+@property (nonatomic, copy) NSNumber *borderLeftWidth;
+@property (nonatomic, copy) NSNumber *borderStartWidth;
+@property (nonatomic, copy) NSNumber *borderEndWidth;
+@property (nonatomic, copy) NSNumber *borderWidth;
 
 /**
  * Border styles.

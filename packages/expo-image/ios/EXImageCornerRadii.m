@@ -1,6 +1,6 @@
 // Copyright 2020-present 650 Industries. All rights reserved.
 
-#import <expo-image/EXImageViewBorders.h>
+#import <expo-image/EXImageCornerRadii.h>
 #import <React/RCTUtils.h>
 
 static CGFloat EXImageDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
@@ -8,102 +8,7 @@ static CGFloat EXImageDefaultIfNegativeTo(CGFloat defaultValue, CGFloat x)
   return x >= 0 ? x : defaultValue;
 };
 
-static const CGFloat EXImageViewBorderThreshold = 0.001;
-
-
-EXImageBorderEdge EXImageBorderEdgeMake(CGFloat width, CGColorRef color, RCTBorderStyle style)
-{
-  EXImageBorderEdge edge;
-  edge.width = width;
-  edge.color = color;
-  edge.style = style;
-  return edge;
-}
-
-EXImageBorderEdges EXImageBorderEdgesInit()
-{
-  EXImageBorderEdges borderEdges;
-  EXImageBorderEdge edge = EXImageBorderEdgeMake(-1, nil, RCTBorderStyleUnset);
-  borderEdges.all = EXImageBorderEdgeMake(-1, nil, RCTBorderStyleSolid);
-  borderEdges.top = edge;
-  borderEdges.right = edge;
-  borderEdges.bottom = edge;
-  borderEdges.left = edge;
-  borderEdges.start = edge;
-  borderEdges.end = edge;
-  return borderEdges;
-}
-
-void EXImageBorderEdgesRelease(EXImageBorderEdges borderEdges)
-{
-  CGColorRelease(borderEdges.all.color);
-  CGColorRelease(borderEdges.top.color);
-  CGColorRelease(borderEdges.right.color);
-  CGColorRelease(borderEdges.bottom.color);
-  CGColorRelease(borderEdges.left.color);
-  CGColorRelease(borderEdges.start.color);
-  CGColorRelease(borderEdges.end.color);
-}
-
-EXImageBorderEdge EXImageBorderEdgeResolve(EXImageBorderEdge borderEdge, EXImageBorderEdge defaultEdge)
-{
-  return EXImageBorderEdgeMake(
-                               (borderEdge.width > -1) ?borderEdge.width : defaultEdge.width,
-                               borderEdge.color ? borderEdge.color : defaultEdge.color,
-                               (borderEdge.style != RCTBorderStyleUnset) ? borderEdge.style : defaultEdge.style
-                               );
-}
-
-EXImageBorderEdges EXImageBorderEdgesResolve(EXImageBorderEdges borderEdges, UIUserInterfaceLayoutDirection layoutDirection, BOOL swapLeftRightInRTL)
-{
-  EXImageBorderEdge edge = EXImageBorderEdgeMake(-1, nil, RCTBorderStyleSolid);
-  EXImageBorderEdges edges;
-  edges.all = edge;
-  edges.start = edge;
-  edges.end = edge;
-  
-  edges.top = EXImageBorderEdgeResolve(borderEdges.top, borderEdges.all);
-  edges.bottom = EXImageBorderEdgeResolve(borderEdges.bottom, borderEdges.all);
-  
-  const BOOL isRTL = layoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-  if (swapLeftRightInRTL) {
-    EXImageBorderEdge startEdge = EXImageBorderEdgeResolve(borderEdges.left, borderEdges.start);
-    EXImageBorderEdge endEdge = EXImageBorderEdgeResolve(borderEdges.right, borderEdges.end);
-    EXImageBorderEdge leftEdge = isRTL ? endEdge : startEdge;
-    EXImageBorderEdge rightEdge = isRTL ? startEdge : endEdge;
-    edges.left = EXImageBorderEdgeResolve(leftEdge, borderEdges.all);
-    edges.right = EXImageBorderEdgeResolve(rightEdge, borderEdges.all);
-  } else {
-    EXImageBorderEdge leftEdge = isRTL ? borderEdges.end : borderEdges.start;
-    EXImageBorderEdge rightEdge = isRTL ? borderEdges.start : borderEdges.end;
-    edges.left = EXImageBorderEdgeResolve(EXImageBorderEdgeResolve(leftEdge, borderEdges.left), borderEdges.all);
-    edges.right = EXImageBorderEdgeResolve(EXImageBorderEdgeResolve(rightEdge, borderEdges.right), borderEdges.all);
-  }
-  return edges;
-}
-
-BOOL EXImageBorderEdgeEqualToEdge(EXImageBorderEdge borderEdge, EXImageBorderEdge equalToEdge)
-{
-  return (ABS(borderEdge.width - equalToEdge.width) < EXImageViewBorderThreshold)
-  && (borderEdge.style == equalToEdge.style)
-  && CGColorEqualToColor(borderEdge.color, equalToEdge.color);
-}
-
-BOOL EXImageBorderEdgesAllEqual(EXImageBorderEdges borderEdges)
-{
-  return EXImageBorderEdgeEqualToEdge(borderEdges.top, borderEdges.right)
-  && EXImageBorderEdgeEqualToEdge(borderEdges.top, borderEdges.bottom)
-  && EXImageBorderEdgeEqualToEdge(borderEdges.top, borderEdges.left);
-}
-
-BOOL EXImageBorderEdgeVisible(EXImageBorderEdge borderEdge)
-{
-  return borderEdge.color
-  && (borderEdge.width >= EXImageViewBorderThreshold)
-  && (borderEdge.style != RCTBorderStyleUnset);
-}
-
-
+static const CGFloat EXImageCornerRadiiThreshold = 0.001;
 
 EXImageCornerRadii EXImageCornerRadiiInit()
 {
@@ -122,9 +27,9 @@ EXImageCornerRadii EXImageCornerRadiiInit()
 
 BOOL EXImageCornerRadiiAllEqual(EXImageCornerRadii cornerRadii)
 {
-  return ABS(cornerRadii.topLeft - cornerRadii.topRight) < EXImageViewBorderThreshold &&
-  ABS(cornerRadii.topLeft - cornerRadii.bottomLeft) < EXImageViewBorderThreshold &&
-  ABS(cornerRadii.topLeft - cornerRadii.bottomRight) < EXImageViewBorderThreshold;
+  return ABS(cornerRadii.topLeft - cornerRadii.topRight) < EXImageCornerRadiiThreshold &&
+  ABS(cornerRadii.topLeft - cornerRadii.bottomLeft) < EXImageCornerRadiiThreshold &&
+  ABS(cornerRadii.topLeft - cornerRadii.bottomRight) < EXImageCornerRadiiThreshold;
 }
 
 RCTCornerInsets EXImageGetCornerInsets(EXImageCornerRadii cornerRadii, UIEdgeInsets edgeInsets)
