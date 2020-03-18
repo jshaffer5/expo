@@ -64,14 +64,10 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
   }
 
   @ReactProp(name = "resizeMode")
-  public void setResizeMode(ImageView view, String resizeMode) {
-    ImageView.ScaleType scaleType;
-    if (resizeMode.equals("repeat")) {
-      scaleType = ImageView.ScaleType.FIT_XY;
-    } else {
-      scaleType = ExpoImageTypes.getScaleType(resizeMode);
-    }
-    view.setScaleType(scaleType);
+  public void setResizeMode(ImageView view, String stringValue) {
+    ExpoImageResizeMode resizeMode = ExpoImageResizeMode.fromStringValue(stringValue);
+    view.setScaleType(resizeMode.getScaleType());
+    // TODO: repeat mode handling
   }
 
   // View lifecycle
@@ -80,7 +76,7 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
   @Override
   public ImageView createViewInstance(@NonNull ThemedReactContext context) {
     ImageView imageView = new ImageView(context);
-    imageView.setScaleType(ImageView.ScaleType.CENTER_CROP); // default = cover
+    imageView.setScaleType(ExpoImageResizeMode.COVER.getScaleType());
     return imageView;
   }
 
