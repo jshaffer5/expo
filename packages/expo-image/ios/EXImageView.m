@@ -13,19 +13,13 @@ static NSString * const sourceScaleKey = @"scale";
 @interface EXImageView ()
 
 @property (nonatomic, strong) SDAnimatedImageView *imageView;
-
-@property (nonatomic, assign) EXImageBorders borders;
-@property (nonatomic, assign) EXImageCornerRadii cornerRadii;
-@property (nonatomic, strong) CALayer *borderLayer;
-@property (nonatomic, strong) CALayer *borderTopLayer;
-@property (nonatomic, strong) CALayer *borderRightLayer;
-@property (nonatomic, strong) CALayer *borderBottomLayer;
-@property (nonatomic, strong) CALayer *borderLeftLayer;
-
 @property (nonatomic, strong) NSDictionary *source;
 @property (nonatomic, assign) RCTResizeMode resizeMode;
-
 @property (nonatomic, assign) BOOL needsReload;
+
+@property (nonatomic, assign) EXImageCornerRadii cornerRadii;
+@property (nonatomic, assign) EXImageBorders borders;
+@property (nonatomic, strong) NSDictionary<NSString *, CALayer *> *borderLayers;
 
 @end
 
@@ -37,9 +31,10 @@ static NSString * const sourceScaleKey = @"scale";
     _needsReload = NO;
     
     _resizeMode = RCTResizeModeCover;
-    _borders = EXImageBordersInit();
     _cornerRadii = EXImageCornerRadiiInit();
-
+    _borders = EXImageBordersInit();
+    _borderLayers = @{};
+    
     _imageView = [SDAnimatedImageView new];
     _imageView.frame = self.bounds;
     _imageView.contentMode = (UIViewContentMode)_resizeMode;
@@ -90,7 +85,6 @@ static NSString * const sourceScaleKey = @"scale";
   if (_needsReload) {
     [self reloadImage];
   }
-  [self updateStyle];
 }
 
 - (void)reloadImage
@@ -135,11 +129,6 @@ static NSString * const sourceScaleKey = @"scale";
   }];
 }
 
-- (void)updateStyle
-{
-  // TODO ?
-}
-
 - (void)displayLayer:(CALayer *)layer
 {
   if (CGSizeEqualToSize(layer.bounds.size, CGSizeZero)) {
@@ -151,8 +140,8 @@ static NSString * const sourceScaleKey = @"scale";
   EXImageCornerRadii cornerRadii = EXImageCornerRadiiResolve(_cornerRadii, _reactLayoutDirection, swapLeftRightInRTL, bounds.size);
   EXImageBorders borders = EXImageBordersResolve(_borders, _reactLayoutDirection, swapLeftRightInRTL);
   
-  [self updateClipBoundsForCornerRadii:cornerRadii bounds:bounds];
-  [self updateBorderLayersForborders:borders cornerRadii:cornerRadii bounds:bounds];
+  [self updateClipMaskForCornerRadii:cornerRadii bounds:bounds];
+  [self updateBorderLayersForBorders:borders cornerRadii:cornerRadii bounds:bounds];
 }
 
 - (void)setReactLayoutDirection:(UIUserInterfaceLayoutDirection)layoutDirection
@@ -169,7 +158,7 @@ static NSString * const sourceScaleKey = @"scale";
   }
 }
 
-- (void)updateClipBoundsForCornerRadii:(EXImageCornerRadii)cornerRadii bounds:(CGRect)bounds
+- (void)updateClipMaskForCornerRadii:(EXImageCornerRadii)cornerRadii bounds:(CGRect)bounds
 {
   CALayer *mask = nil;
   CGFloat cornerRadius = 0;
@@ -181,8 +170,8 @@ static NSString * const sourceScaleKey = @"scale";
     RCTCornerInsets cornerInsets = EXImageGetCornerInsets(cornerRadii, UIEdgeInsetsZero);
     CGPathRef path = RCTPathCreateWithRoundedRect(bounds, cornerInsets, NULL);
     shapeLayer.path = path;
-    mask = shapeLayer;
     CGPathRelease(path);
+    mask = shapeLayer;
   }
   
   _imageView.layer.cornerRadius = cornerRadius;
@@ -190,87 +179,82 @@ static NSString * const sourceScaleKey = @"scale";
   _imageView.layer.masksToBounds = YES;
 }
 
-- (void)updateBorderLayersForborders:(EXImageBorders)borders cornerRadii:(EXImageCornerRadii)cornerRadii bounds:(CGRect)bounds
+- (void)updateBorderLayersForBorders:(EXImageBorders)borders cornerRadii:(EXImageCornerRadii)cornerRadii bounds:(CGRect)bounds
 {
-  CALayer *borderLayer = nil;
-  CALayer *borderTopLayer = nil;
-  CALayer *borderRightLayer = nil;
-  CALayer *borderBottomLayer = nil;
-  CALayer *borderLeftLayer = nil;
+  NSMutableDictionary<NSString *, CALayer *> *borderLayers = [NSMutableDictionary dictionary];
   
   // Shape-layers draw the stroke in the middle of the path. The border should
-  // however be drawn on the inside of the outer edge. Therefore calculate the path
-  // for CAShapeLayer with an inset to the center so that it draws the outer edge
-  // of the stroke
+  // however be drawn on the inside of the outer path. Therefore calculate the path
+  // for CAShapeLayer with an offset to the outside path, so that the stroke edges
+  // line-up with the outside path.
   UIEdgeInsets edgeInsets = UIEdgeInsetsMake(borders.top.width * 0.5, borders.left.width * 0.5, borders.bottom.width * 0.5, borders.right.width * 0.5);
   RCTCornerInsets cornerInsets = EXImageGetCornerInsets(cornerRadii, edgeInsets);
   CGPathRef shapeLayerPath = RCTPathCreateWithRoundedRect(UIEdgeInsetsInsetRect(bounds, edgeInsets), cornerInsets, NULL);
   
-  
-  // TEST
-  /*CAShapeLayer *bkLayer;
-   bkLayer = [CAShapeLayer layer];
-   bkLayer.fillColor = UIColor.clearColor.CGColor;
-   bkLayer.strokeColor = [UIColor redColor].CGColor;
-   bkLayer.lineWidth = 1;
-   bkLayer.path = shapeLayerPath;
-   bkLayer.frame = bounds;
-   borderTopLayer = bkLayer;*/
-  
   // Optimized code-path using a single layer when with no required masking
+  // This code-path is preferred and yields the best possible performance.
+  // When possible, a simple CALayer with optional corner-radius is used.
+  // In case the corner-radii are different, a single CAShapeLayer will be used.
   if (EXImageBordersAllEqual(borders)) {
     EXImageBorder border = borders.top;
     if (EXImageBorderVisible(border)) {
+      CALayer *borderLayer = _borderLayers[@"all"];
       if ((border.style == RCTBorderStyleSolid) &&
           EXImageCornerRadiiAllEqual(cornerRadii)) {
-        borderLayer = EXImageBorderSimpleLayer(_borderLayer, border, bounds, cornerRadii.topLeft);
+        borderLayer = EXImageBorderSimpleLayer(borderLayer, border, bounds, cornerRadii.topLeft);
       } else {
-        borderLayer = EXImageBorderShapeLayer(_borderLayer, border, bounds, shapeLayerPath, nil);
+        borderLayer = EXImageBorderShapeLayer(borderLayer, border, bounds, shapeLayerPath, nil);
       }
+      [borderLayers setValue:borderLayer forKey:@"all"];
     }
   } else {
     
-    // Define a layer for each border-edge.
+    // Define a layer for each visible border. Each layer is masked so that it only
+    // shows that edge.
     if (EXImageBorderVisible(borders.top)) {
-      borderTopLayer = EXImageBorderShapeLayer(_borderTopLayer, borders.top, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationTop));
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"top"], borders.top, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationTop)) forKey:@"top"];
     }
     if (EXImageBorderVisible(borders.right)) {
-      borderRightLayer = EXImageBorderShapeLayer(_borderRightLayer, borders.right, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationRight));
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"right"], borders.right, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationRight)) forKey:@"right"];
     }
     if (EXImageBorderVisible(borders.bottom)) {
-      borderBottomLayer = EXImageBorderShapeLayer(_borderBottomLayer, borders.bottom, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationBottom));
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"bottom"], borders.bottom, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationBottom)) forKey:@"bottom"];
     }
     if (EXImageBorderVisible(borders.left)) {
-      borderLeftLayer = EXImageBorderShapeLayer(_borderLeftLayer, borders.left, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationLeft));
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"left"], borders.left, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationLeft)) forKey:@"left"];
+    }
+  }
+  CGPathRelease(shapeLayerPath);
+  
+  // Add new/updated layers
+  for (NSString* key in borderLayers) {
+    CALayer *layer = borderLayers[key];
+    if (_borderLayers[key] != layer) {
+      [_imageView.layer addSublayer:layer];
     }
   }
   
-#define updateLayer(instanceVar, localVar) \
-if (instanceVar != localVar) { \
-if (instanceVar) [instanceVar removeFromSuperlayer]; \
-instanceVar = localVar; \
-if (localVar) [_imageView.layer addSublayer:localVar]; \
-}
-  updateLayer(_borderLayer, borderLayer);
-  updateLayer(_borderTopLayer, borderTopLayer);
-  updateLayer(_borderRightLayer, borderRightLayer);
-  updateLayer(_borderBottomLayer, borderBottomLayer);
-  updateLayer(_borderLeftLayer, borderLeftLayer);
-  
-  CGPathRelease(shapeLayerPath);
+  // Remove old layers
+  for (NSString* key in _borderLayers) {
+    CALayer *layer = _borderLayers[key];
+    if (borderLayers[key] != layer) {
+      [layer removeFromSuperlayer];
+    }
+  }
+  _borderLayers = borderLayers;
 }
 
 #pragma mark - Border Radius
 
-#define setBorderRadius(side, var)                 \
--(void)setBorder##side##Radius : (NSNumber *)radius \
-{                                                \
+#define setBorderRadius(side, var)                       \
+-(void)setBorder##side##Radius : (NSNumber *)radius      \
+{                                                        \
 CGFloat val = (radius != nil) ? radius.doubleValue : -1; \
-if (_cornerRadii.var == val) {              \
-return;                                      \
-}                                              \
-_cornerRadii.var = val;                     \
-[self.layer setNeedsDisplay];                  \
+if (_cornerRadii.var == val) {                           \
+return;                                                  \
+}                                                        \
+_cornerRadii.var = val;                                  \
+[self.layer setNeedsDisplay];                            \
 }
 
 setBorderRadius(,all)
@@ -286,32 +270,32 @@ setBorderRadius(BottomEnd, bottomEnd)
 
 #pragma mark Border Color / Width / Style
 
-#define setBorder(side, var)                                \
--(void)setBorder##side##Color : (CGColorRef)color             \
-{                                                             \
-if (CGColorEqualToColor(_borders.var.color, color)) {   \
+#define setBorder(side, var)                              \
+-(void)setBorder##side##Color : (CGColorRef)color         \
+{                                                         \
+if (CGColorEqualToColor(_borders.var.color, color)) {     \
 return;                                                   \
-}                                                           \
-CGColorRelease(_borders.var.color);                     \
-_borders.var.color = CGColorRetain(color);              \
-[self.layer setNeedsDisplay];                               \
-}                                                             \
--(void)setBorder##side##Width : (NSNumber *)width                \
-{                                                             \
-CGFloat val = (width != nil) ? width.doubleValue : -1; \
-if (_borders.var.width == val) {                      \
+}                                                         \
+CGColorRelease(_borders.var.color);                       \
+_borders.var.color = CGColorRetain(color);                \
+[self.layer setNeedsDisplay];                             \
+}                                                         \
+-(void)setBorder##side##Width : (NSNumber *)width         \
+{                                                         \
+CGFloat val = (width != nil) ? width.doubleValue : -1;    \
+if (_borders.var.width == val) {                          \
 return;                                                   \
-}                                                           \
-_borders.var.width = val;                             \
-[self.layer setNeedsDisplay];                               \
-}                                                             \
--(void)setBorder##side##Style : (RCTBorderStyle)style         \
-{                                                             \
-if (_borders.var.style == style) {                      \
+}                                                         \
+_borders.var.width = val;                                 \
+[self.layer setNeedsDisplay];                             \
+}                                                         \
+-(void)setBorder##side##Style : (RCTBorderStyle)style     \
+{                                                         \
+if (_borders.var.style == style) {                        \
 return;                                                   \
-}                                                           \
-_borders.var.style = style;                             \
-[self.layer setNeedsDisplay];                               \
+}                                                         \
+_borders.var.style = style;                               \
+[self.layer setNeedsDisplay];                             \
 }
 
 setBorder(,all)

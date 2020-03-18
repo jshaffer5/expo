@@ -42,10 +42,10 @@ void EXImageBordersRelease(EXImageBorders borders)
 EXImageBorder EXImageBorderResolve(EXImageBorder border, EXImageBorder defaultBorder)
 {
   return EXImageBorderMake(
-                               (border.width > -1) ?border.width : defaultBorder.width,
-                               border.color ? border.color : defaultBorder.color,
-                               (border.style != RCTBorderStyleUnset) ? border.style : defaultBorder.style
-                               );
+                           (border.width > -1) ?border.width : defaultBorder.width,
+                           border.color ? border.color : defaultBorder.color,
+                           (border.style != RCTBorderStyleUnset) ? border.style : defaultBorder.style
+                           );
 }
 
 EXImageBorders EXImageBordersResolve(EXImageBorders borders, UIUserInterfaceLayoutDirection layoutDirection, BOOL swapLeftRightInRTL)
@@ -102,26 +102,26 @@ CALayer *EXImageBorderMask(CGRect bounds, EXImageBorderLocation location)
 {
   UIBezierPath *path = [UIBezierPath bezierPath];
   switch (location) {
-  case EXImageBorderLocationLeft:
-    [path moveToPoint:bounds.origin];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.height * 0.5, bounds.origin.y + bounds.size.height * 0.5)];
-    [path addLineToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height)];
-    break;
-  case EXImageBorderLocationTop:
-    [path moveToPoint:bounds.origin];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.width * 0.5)];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y)];
-    break;
-  case EXImageBorderLocationRight:
-    [path moveToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y)];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - bounds.size.height * 0.5, bounds.origin.y + bounds.size.height * 0.5)];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height)];
-    break;
-  case EXImageBorderLocationBottom:
-    [path moveToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height)];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.height - bounds.size.width * 0.5)];
-    [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height)];
-    break;
+    case EXImageBorderLocationLeft:
+      [path moveToPoint:bounds.origin];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.height * 0.5, bounds.origin.y + bounds.size.height * 0.5)];
+      [path addLineToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+      break;
+    case EXImageBorderLocationTop:
+      [path moveToPoint:bounds.origin];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.width * 0.5)];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y)];
+      break;
+    case EXImageBorderLocationRight:
+      [path moveToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y)];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - bounds.size.height * 0.5, bounds.origin.y + bounds.size.height * 0.5)];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height)];
+      break;
+    case EXImageBorderLocationBottom:
+      [path moveToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.height - bounds.size.width * 0.5)];
+      [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height)];
+      break;
   }
   
   [path closePath];
@@ -132,6 +132,7 @@ CALayer *EXImageBorderMask(CGRect bounds, EXImageBorderLocation location)
 
 CALayer *EXImageBorderSimpleLayer(CALayer *layer, EXImageBorder border, CGRect bounds, CGFloat cornerRadius)
 {
+  // Re-use original layer when possible
   cornerRadius = MAX(cornerRadius, 0);
   if (layer
       && ![layer isKindOfClass:[CAShapeLayer class]]
@@ -153,7 +154,7 @@ CALayer *EXImageBorderSimpleLayer(CALayer *layer, EXImageBorder border, CGRect b
 
 CALayer *EXImageBorderShapeLayer(CALayer *layer, EXImageBorder border, CGRect bounds, CGPathRef path, CALayer *mask)
 {
-  // TODO, re-use cached layer if possible?
+  // TODO: re-use cached layer if possible?
   
   CAShapeLayer *shapeLayer = [CAShapeLayer layer];
   shapeLayer.frame = bounds;
