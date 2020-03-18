@@ -37,12 +37,15 @@ static NSString * const sourceScaleKey = @"scale";
 - (void)setSource:(NSDictionary *)source
 {
   _source = source;
+  // TODO: Implement equatable image source abstraction
   _needsReload = YES;
 }
 
 - (void)setResizeMode:(RCTResizeMode)resizeMode
 {
-  if (_resizeMode == resizeMode) return;
+  if (_resizeMode == resizeMode) {
+    return;
+  }
   
   // Image needs to be reloaded whenever repeat is enabled or disabled
   _needsReload = _needsReload || (resizeMode == RCTResizeModeRepeat) || (_resizeMode == RCTResizeModeRepeat);
@@ -80,22 +83,27 @@ static NSString * const sourceScaleKey = @"scale";
     [context setValue:scale forKey:SDWebImageContextImageScaleFactor];
   }
   
+  __weak EXImageView *weakSelf = self;
   [self sd_setImageWithURL:imageUrl
           placeholderImage:nil
                    options:SDWebImageAvoidAutoSetImage
                    context:context
                   progress:nil
                  completed:^(UIImage * _Nullable image, NSError * _Nullable error, SDImageCacheType cacheType, NSURL * _Nullable imageURL) {
+    __strong EXImageView *strongSelf = weakSelf;
+    if (!strongSelf) {
+      return;
+    }
     
     // Modifications to the image like changing the resizing-mode or cap-insets
     // cannot be handled using a SDWebImage transformer, because they don't change
-    // the image-data and this causes this "meta" data to be lost in the SWWebImage caching process.
+    // the image-data and this causes this "meta" data to be lost in the SDWebImage caching process.
     if (image) {
       if (resizeMode == RCTResizeModeRepeat) {
         image = [image resizableImageWithCapInsets:UIEdgeInsetsZero resizingMode:UIImageResizingModeTile];
       }
     }
-    self.image = image;
+    strongSelf.image = image;
   }];
 }
 
