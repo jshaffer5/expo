@@ -7,6 +7,7 @@ import com.bumptech.glide.RequestManager;
 import com.bumptech.glide.request.RequestOptions;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
@@ -66,6 +67,9 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
   @ReactProp(name = "resizeMode")
   public void setResizeMode(ImageView view, String stringValue) {
     ExpoImageResizeMode resizeMode = ExpoImageResizeMode.fromStringValue(stringValue);
+    if (resizeMode == ExpoImageResizeMode.UNKNOWN) {
+      throw new JSApplicationIllegalArgumentException("Invalid resizeMode: " + stringValue);
+    }
     view.setScaleType(resizeMode.getScaleType());
     // TODO: repeat mode handling
   }
