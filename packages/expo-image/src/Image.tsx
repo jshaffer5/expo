@@ -10,6 +10,8 @@ import {
 
 import ExpoImage from './ExpoImage';
 
+const DEFAULT_RESIZE_MODE = 'cover';
+
 export interface ImageProps extends AccessibilityProps {
   // On one hand we want to pass resolved source to native module.
   // On the other hand, react-native-web doesn't expose a resolveAssetSource
@@ -26,7 +28,7 @@ export default class Image extends React.Component<ImageProps> {
     const { style, resizeMode: resizeModeProp, ...restProps } = this.props;
 
     const { resizeMode: resizeModeStyle, ...restStyle } = StyleSheet.flatten([style]) || {};
-    const resizeMode = resizeModeProp || resizeModeStyle || 'cover';
+    const resizeMode = resizeModeProp ?? resizeModeStyle ?? DEFAULT_RESIZE_MODE;
 
     return <ExpoImage {...restProps} style={restStyle} resizeMode={resizeMode} />;
   }
