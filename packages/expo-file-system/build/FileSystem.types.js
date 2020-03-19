@@ -3,6 +3,11 @@ export var FileSystemSessionType;
     FileSystemSessionType[FileSystemSessionType["BACKGROUND"] = 0] = "BACKGROUND";
     FileSystemSessionType[FileSystemSessionType["FOREGROUND"] = 1] = "FOREGROUND";
 })(FileSystemSessionType || (FileSystemSessionType = {}));
+export var FileSystemUploadType;
+(function (FileSystemUploadType) {
+    FileSystemUploadType[FileSystemUploadType["RAW"] = 0] = "RAW";
+    FileSystemUploadType[FileSystemUploadType["MULTIPART"] = 1] = "MULTIPART";
+})(FileSystemUploadType || (FileSystemUploadType = {}));
 export var EncodingType;
 (function (EncodingType) {
     EncodingType["UTF8"] = "utf8";

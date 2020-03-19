@@ -2,6 +2,10 @@ export declare enum FileSystemSessionType {
     BACKGROUND = 0,
     FOREGROUND = 1
 }
+export declare enum FileSystemUploadType {
+    RAW = 0,
+    MULTIPART = 1
+}
 export declare type DownloadOptions = {
     md5?: boolean;
     cache?: boolean;
@@ -21,7 +25,16 @@ export declare type DownloadResult = {
     uri: string;
     md5?: string;
 } & HttpResult;
-export declare type FileSystemUploadOptions = {
+export declare type FileSystemUploadOptions = ({
+    uploadType?: FileSystemUploadType.RAW;
+} | {
+    uploadType: FileSystemUploadType.MULTIPART;
+    fieldName?: string;
+    mimeType?: string;
+    parameters?: {
+        [key: string]: any;
+    };
+}) & {
     headers?: {
         [name: string]: string;
     };
