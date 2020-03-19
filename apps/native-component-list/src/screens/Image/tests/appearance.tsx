@@ -69,9 +69,35 @@ const imageTests: ImageTestGroup = {
       },
     },
     {
+      name: 'Background color and radius',
+      props: {
+        style: {
+          backgroundColor: tintColor,
+          borderRadius: 30,
+        },
+      },
+    },
+    {
       name: 'Shadow',
       props: ({ range }: ImageTestPropsFnInput) => ({
         style: {
+          backgroundColor: 'green',
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: range(2, 5),
+          },
+          shadowOpacity: range(0.2, 0.5),
+          shadowRadius: range(0, 10),
+          elevation: range(0, 10),
+        },
+      }),
+    },
+    {
+      name: 'Shadow and background',
+      props: ({ range }: ImageTestPropsFnInput) => ({
+        style: {
+          backgroundColor: 'white',
           shadowColor: '#000',
           shadowOffset: {
             width: 0,
