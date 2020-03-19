@@ -37,6 +37,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.net.CookieHandler;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -44,14 +45,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.Interceptor;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -485,14 +485,50 @@ public class FileSystemModule extends ExportedModule {
         }
       }
 
-      RequestBody body = RequestBody.create(null, uriToFile(fileUri));
-
+      File file = uriToFile(fileUri);
       String method = "POST";
       if (options.containsKey("httpMethod")) {
         method = importHttpMethod((int) (double) options.get("httpMethod"));
       }
 
-      requestBuilder.method(method, body);
+      int type = 0;
+      if (options.containsKey("uploadType")) {
+        type = (int) (double) options.get("uploadType");
+      }
+
+      if (isRawUpload(type)) {
+        RequestBody body = RequestBody.create(null, file);
+        requestBuilder.method(method, body);
+      } else {
+        MultipartBody.Builder bodyBuilder = new MultipartBody.Builder()
+          .setType(MultipartBody.FORM);
+
+        if (options.containsKey("parameters")) {
+          Map<String, Object> parametersMap = (Map<String, Object>) options.get("parameters");
+          for (String key : parametersMap.keySet()) {
+            String value = String.valueOf(parametersMap.get(key));
+
+            bodyBuilder.addFormDataPart(key, value);
+          }
+        }
+
+        String mimeType;
+        if (options.containsKey("mimeType")) {
+          mimeType = (String) options.get("mimeType");
+        } else {
+          mimeType = URLConnection.guessContentTypeFromName(file.getName());
+        }
+
+        String fieldName = file.getName();
+        if (options.containsKey("fieldName")) {
+          fieldName = (String) options.get("fieldName");
+        }
+
+        bodyBuilder.addFormDataPart(fieldName, file.getName(), RequestBody.create(mimeType != null ? MediaType.parse(mimeType) : null, file));
+
+        requestBuilder.method(method, bodyBuilder.build());
+      }
+
 
       getOkHttpClient().newCall(requestBuilder.build()).enqueue(new Callback() {
         @Override
@@ -996,5 +1032,9 @@ public class FileSystemModule extends ExportedModule {
     }
 
     return "POST";
+  }
+
+  private boolean isRawUpload(int type) {
+    return type == 0;
   }
 }
