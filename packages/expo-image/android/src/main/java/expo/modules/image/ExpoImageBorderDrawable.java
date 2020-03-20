@@ -122,7 +122,7 @@ public class ExpoImageBorderDrawable extends Drawable {
   @Override
   public void draw(Canvas canvas) {
     updatePathEffect();
-    if (!hasRoundedBorders()) {
+    if (!hasRoundedBorders() && mBorderStyle == BorderStyle.SOLID) {
       drawRectangularBackgroundWithBorders(canvas);
     } else {
       drawRoundedBackgroundWithBorders(canvas);
