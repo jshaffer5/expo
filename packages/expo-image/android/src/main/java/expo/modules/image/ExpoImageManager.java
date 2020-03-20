@@ -13,6 +13,7 @@ import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.annotations.ReactPropGroup;
 import com.facebook.react.uimanager.ViewProps;
+import com.facebook.react.uimanager.Spacing;
 import com.facebook.yoga.YogaConstants;
 
 import com.facebook.react.uimanager.PixelUtil;
@@ -27,6 +28,16 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
   private static final String SOURCE_WIDTH_KEY = "width";
   private static final String SOURCE_HEIGHT_KEY = "height";
   private static final String SOURCE_SCALE_KEY = "scale";
+
+  private static final int[] BORDER_LOCATIONS = {
+          Spacing.ALL,
+          Spacing.LEFT,
+          Spacing.RIGHT,
+          Spacing.TOP,
+          Spacing.BOTTOM,
+          Spacing.START,
+          Spacing.END,
+  };
 
   private RequestManager mRequestManager;
 
@@ -101,13 +112,8 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
     if (!YogaConstants.isUndefined(borderRadius) && borderRadius < 0) {
       borderRadius = YogaConstants.UNDEFINED;
     }
-    view.setBorderRadius(borderRadius, index);
+    view.setBorderRadius(index, borderRadius);
   }
-
-  /*@ReactProp(name = "borderStyle")
-  public void setBorderStyle(ExpoImageView view, @Nullable String borderStyle) {
-    view.setBorderStyle(borderStyle);
-  }*/
 
   @ReactPropGroup(
           names = {
@@ -121,7 +127,7 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
           },
           defaultFloat = YogaConstants.UNDEFINED)
   public void setBorderWidth(ExpoImageView view, int index, float width) {
-    /*if (!YogaConstants.isUndefined(width) && width < 0) {
+    if (!YogaConstants.isUndefined(width) && width < 0) {
       width = YogaConstants.UNDEFINED;
     }
 
@@ -129,7 +135,7 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
       width = PixelUtil.toPixelFromDIP(width);
     }
 
-    view.setBorderWidth(SPACING_TYPES[index], width);*/
+    view.setBorderWidth(BORDER_LOCATIONS[index], width);
   }
 
   @ReactPropGroup(
@@ -144,10 +150,15 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
           },
           customType = "Color")
   public void setBorderColor(ExpoImageView view, int index, Integer color) {
-    /*float rgbComponent =
+    float rgbComponent =
             color == null ? YogaConstants.UNDEFINED : (float) ((int) color & 0x00FFFFFF);
     float alphaComponent = color == null ? YogaConstants.UNDEFINED : (float) ((int) color >>> 24);
-    view.setBorderColor(SPACING_TYPES[index], rgbComponent, alphaComponent);*/
+    view.setBorderColor(BORDER_LOCATIONS[index], rgbComponent, alphaComponent);
+  }
+
+  @ReactProp(name = "borderStyle")
+  public void setBorderStyle(ExpoImageView view, @Nullable String borderStyle) {
+    view.setBorderStyle(borderStyle);
   }
 
   // View lifecycle

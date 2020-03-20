@@ -147,6 +147,10 @@ public class ExpoImageOutlineProvider extends ViewOutlineProvider {
     }
   }
 
+  float[] getBorderRadii() {
+      return mBorderRadiusConfig;
+  }
+
   boolean hasEqualCorners() {
     updateCornerRadiiIfNeeded();
     float initialCornerRadius = mCornerRadii[0];
