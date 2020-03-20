@@ -86,7 +86,6 @@ public class ExpoImageBorderDrawable extends Drawable {
   private @Nullable Path mCenterDrawPath;
   private @Nullable RectF mInnerClipTempRectForBorderRadius;
   private @Nullable RectF mOuterClipTempRectForBorderRadius;
-  private @Nullable RectF mTempRectForBorderRadiusOutline;
   private @Nullable RectF mTempRectForCenterDrawPath;
   private @Nullable PointF mInnerTopLeftCorner;
   private @Nullable PointF mInnerTopRightCorner;
@@ -502,9 +501,6 @@ public class ExpoImageBorderDrawable extends Drawable {
       mOuterClipTempRectForBorderRadius = new RectF();
     }
 
-    if (mTempRectForBorderRadiusOutline == null) {
-      mTempRectForBorderRadiusOutline = new RectF();
-    }
 
     if (mTempRectForCenterDrawPath == null) {
       mTempRectForCenterDrawPath = new RectF();
@@ -517,7 +513,6 @@ public class ExpoImageBorderDrawable extends Drawable {
 
     mInnerClipTempRectForBorderRadius.set(getBounds());
     mOuterClipTempRectForBorderRadius.set(getBounds());
-    mTempRectForBorderRadiusOutline.set(getBounds());
     mTempRectForCenterDrawPath.set(getBounds());
 
     final RectF borderWidth = getDirectionAwareBorderInsets();
@@ -641,7 +636,7 @@ public class ExpoImageBorderDrawable extends Drawable {
     }
 
     mPathForBorderRadiusOutline.addRoundRect(
-        mTempRectForBorderRadiusOutline,
+            mOuterClipTempRectForBorderRadius,
         new float[] {
           topLeftRadius + extraRadiusForOutline,
           topLeftRadius + extraRadiusForOutline,
