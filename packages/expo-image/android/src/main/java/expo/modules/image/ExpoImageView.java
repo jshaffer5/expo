@@ -10,13 +10,12 @@ import androidx.annotation.Nullable;
 
 import com.facebook.react.modules.i18nmanager.I18nUtil;
 import com.facebook.react.uimanager.PixelUtil;
-import com.facebook.react.views.view.ReactViewBackgroundDrawable;
 import com.facebook.yoga.YogaConstants;
 
 class ExpoImageView extends ImageView {
   private int mBackgroundColor;
   private ExpoImageOutlineProvider mOutlineProvider;
-  private ReactViewBackgroundDrawable mBorderDrawable;
+  private ExpoImageBorderDrawable mBorderDrawable;
 
   public ExpoImageView(Context context) {
     super(context);
@@ -70,9 +69,9 @@ class ExpoImageView extends ImageView {
     }
   }
 
-  private ReactViewBackgroundDrawable getOrCreateBorderDrawable() {
+  private ExpoImageBorderDrawable getOrCreateBorderDrawable() {
     if (mBorderDrawable == null) {
-      mBorderDrawable = new ReactViewBackgroundDrawable(getContext());
+      mBorderDrawable = new ExpoImageBorderDrawable(getContext());
       mBorderDrawable.setCallback(this);
       float[] borderRadii = mOutlineProvider.getBorderRadii();
       for (int i = 0; i < borderRadii.length; i++) {
