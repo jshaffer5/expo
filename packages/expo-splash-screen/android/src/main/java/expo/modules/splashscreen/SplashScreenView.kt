@@ -20,9 +20,7 @@ class SplashScreenView(
       view.layoutParams = LayoutParams(
         LayoutParams.MATCH_PARENT,
         LayoutParams.MATCH_PARENT
-      ).also { layoutParams ->
-        layoutParams.addRule(CENTER_IN_PARENT, TRUE)
-      }
+      )
     }
 
     layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
