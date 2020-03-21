@@ -1,34 +1,34 @@
-import { RCTDeviceEventEmitter, UnavailabilityError } from '@unimodules/core';
-import Constants from 'expo-constants';
-import { EventEmitter, EventSubscription } from 'fbemitter';
+import { UnavailabilityError } from '@unimodules/core';
+import { EventSubscription } from 'fbemitter';
 
-import ExpoUpdates from './ExpoUpdates';
+import BareExpoUpdates from './ExpoUpdates';
+import ManagedExpoUpdates from './ExponentUpdates';
+import {
+  Listener,
+  LocalAssets,
+  Manifest,
+  UpdateCheckResult,
+  UpdateEvent,
+  UpdateFetchResult,
+} from './Updates.types';
 
-export enum UpdateEventType {
-  UPDATE_AVAILABLE = 'updateAvailable',
-  NO_UPDATE_AVAILABLE = 'noUpdateAvailable',
-  ERROR = 'error',
-}
+export * from './Updates.types';
 
-// TODO(eric): move source of truth for manifest type to this module
-type Manifest = typeof Constants.manifest;
-
-type UpdateCheckResult = { isAvailable: false } | { isAvailable: true; manifest: Manifest };
-
-type UpdateFetchResult = { isNew: false } | { isNew: true; manifest: Manifest };
-
-type Listener<E> = (event: E) => void;
-
-type UpdateEvent =
-  | { type: UpdateEventType.NO_UPDATE_AVAILABLE }
-  | { type: UpdateEventType.UPDATE_AVAILABLE; manifest: Manifest }
-  | { type: UpdateEventType.ERROR; message: string };
-
-type LocalAssets = { [remoteUrl: string]: string };
+// If ManagedExpoUpdates is nonnull, we must either be in a managed workflow project, or an ExpoKit
+// project with this package installed (so the developer can switch to the new API). In either case,
+// ManagedExpoUpdates is the "active" underlying Updates module implementation, so we'll want to use
+// it. Otherwise, we can safely fall back to BareExpoUpdates.
+// TODO(eric): remove ManagedExpoUpdates once NativeModules.ExponentUpdates is fully decommissioned.
+const ExpoUpdates = ManagedExpoUpdates ?? BareExpoUpdates;
 
 export const localAssets: LocalAssets = ExpoUpdates.localAssets ?? {};
-export const manifest: Manifest | object = ExpoUpdates.manifest ?? {};
 export const isEmergencyLaunch: boolean = ExpoUpdates.isEmergencyLaunch || false;
+
+let _manifest = ExpoUpdates.manifest;
+if (ExpoUpdates.manifestString) {
+  _manifest = JSON.parse(ExpoUpdates.manifestString);
+}
+export const manifest: Manifest | object = _manifest ?? {};
 
 export async function reloadAsync(): Promise<void> {
   if (!ExpoUpdates.reload) {
@@ -65,33 +65,9 @@ export async function fetchUpdateAsync(): Promise<UpdateFetchResult> {
   return result;
 }
 
-let _emitter: EventEmitter | null;
-
-function _getEmitter(): EventEmitter {
-  if (!_emitter) {
-    _emitter = new EventEmitter();
-    RCTDeviceEventEmitter.addListener('Expo.nativeUpdatesEvent', _emitEvent);
-  }
-  return _emitter;
-}
-
-function _emitEvent(params): void {
-  let newParams = params;
-  if (typeof params === 'string') {
-    newParams = JSON.parse(params);
-  }
-  if (newParams.manifestString) {
-    newParams.manifest = JSON.parse(newParams.manifestString);
-    delete newParams.manifestString;
-  }
-
-  if (!_emitter) {
-    throw new Error(`EventEmitter must be initialized to use from its listener`);
-  }
-  _emitter.emit('Expo.updatesEvent', newParams);
-}
-
 export function addListener(listener: Listener<UpdateEvent>): EventSubscription {
-  const emitter = _getEmitter();
-  return emitter.addListener('Expo.updatesEvent', listener);
+  if (!ExpoUpdates.addListener) {
+    throw new UnavailabilityError('Updates', 'addListener');
+  }
+  return ExpoUpdates.addListener(listener);
 }

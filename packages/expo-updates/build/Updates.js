@@ -1,15 +1,20 @@
-import { RCTDeviceEventEmitter, UnavailabilityError } from '@unimodules/core';
-import { EventEmitter } from 'fbemitter';
-import ExpoUpdates from './ExpoUpdates';
-export var UpdateEventType;
-(function (UpdateEventType) {
-    UpdateEventType["UPDATE_AVAILABLE"] = "updateAvailable";
-    UpdateEventType["NO_UPDATE_AVAILABLE"] = "noUpdateAvailable";
-    UpdateEventType["ERROR"] = "error";
-})(UpdateEventType || (UpdateEventType = {}));
+import { UnavailabilityError } from '@unimodules/core';
+import BareExpoUpdates from './ExpoUpdates';
+import ManagedExpoUpdates from './ExponentUpdates';
+export * from './Updates.types';
+// If ManagedExpoUpdates is nonnull, we must either be in a managed workflow project, or an ExpoKit
+// project with this package installed (so the developer can switch to the new API). In either case,
+// ManagedExpoUpdates is the "active" underlying Updates module implementation, so we'll want to use
+// it. Otherwise, we can safely fall back to BareExpoUpdates.
+// TODO(eric): remove ManagedExpoUpdates once NativeModules.ExponentUpdates is fully decommissioned.
+const ExpoUpdates = ManagedExpoUpdates ?? BareExpoUpdates;
 export const localAssets = ExpoUpdates.localAssets ?? {};
-export const manifest = ExpoUpdates.manifest ?? {};
 export const isEmergencyLaunch = ExpoUpdates.isEmergencyLaunch || false;
+let _manifest = ExpoUpdates.manifest;
+if (ExpoUpdates.manifestString) {
+    _manifest = JSON.parse(ExpoUpdates.manifestString);
+}
+export const manifest = _manifest ?? {};
 export async function reloadAsync() {
     if (!ExpoUpdates.reload) {
         throw new UnavailabilityError('Updates', 'reloadAsync');
@@ -38,30 +43,10 @@ export async function fetchUpdateAsync() {
     }
     return result;
 }
-let _emitter;
-function _getEmitter() {
-    if (!_emitter) {
-        _emitter = new EventEmitter();
-        RCTDeviceEventEmitter.addListener('Expo.nativeUpdatesEvent', _emitEvent);
-    }
-    return _emitter;
-}
-function _emitEvent(params) {
-    let newParams = params;
-    if (typeof params === 'string') {
-        newParams = JSON.parse(params);
-    }
-    if (newParams.manifestString) {
-        newParams.manifest = JSON.parse(newParams.manifestString);
-        delete newParams.manifestString;
-    }
-    if (!_emitter) {
-        throw new Error(`EventEmitter must be initialized to use from its listener`);
-    }
-    _emitter.emit('Expo.updatesEvent', newParams);
-}
 export function addListener(listener) {
-    const emitter = _getEmitter();
-    return emitter.addListener('Expo.updatesEvent', listener);
+    if (!ExpoUpdates.addListener) {
+        throw new UnavailabilityError('Updates', 'addListener');
+    }
+    return ExpoUpdates.addListener(listener);
 }
 //# sourceMappingURL=Updates.js.map
