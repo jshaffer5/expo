@@ -13,39 +13,14 @@ import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.yoga.YogaConstants;
 
 class ExpoImageView extends ImageView {
-  private int mBackgroundColor;
   private ExpoImageOutlineProvider mOutlineProvider;
   private ExpoImageBorderDrawable mBorderDrawable;
 
   public ExpoImageView(Context context) {
     super(context);
-    mBackgroundColor = 0;
-    super.setBackgroundColor(mBackgroundColor);
     mOutlineProvider = new ExpoImageOutlineProvider(context);
     setOutlineProvider(mOutlineProvider);
     setClipToOutline(true);
-  }
-
-  @Override
-  public void setBackgroundColor(int color) {
-    mBackgroundColor = color;
-    updateBackgroundColor();
-  }
-
-  @Override
-  public void setElevation(float elevation) {
-    super.setElevation(elevation);
-    updateBackgroundColor();
-  }
-
-  private void updateBackgroundColor() {
-    // Shadows are not masked to the outside of the outline, but are
-    // partially visible on the inside as well. It doesn't seem possible
-    // to mask the shadows without reverting to sofware rendering of the shadows.
-    // As a workaround, the background-color is therefore set to opaque white when
-    // elevation is used and no background color is specified.
-    int backgroundColor = ((getElevation() > 0) && (mBackgroundColor == 0)) ? 0xffffffff : mBackgroundColor;
-    super.setBackgroundColor(backgroundColor);
   }
 
   public void setBorderRadius(int position, float borderRadius) {

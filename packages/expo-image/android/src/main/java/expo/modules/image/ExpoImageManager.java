@@ -90,11 +90,6 @@ public class ExpoImageManager extends SimpleViewManager<ImageView> {
     // TODO: repeat mode handling
   }
 
-  @ReactProp(name = "elevation")
-  public void setElevation(@NonNull ExpoImageView view, float elevation) {
-    view.setElevation(PixelUtil.toPixelFromDIP(elevation));
-  }
-
   @ReactPropGroup(
           names = {
                   ViewProps.BORDER_RADIUS,
