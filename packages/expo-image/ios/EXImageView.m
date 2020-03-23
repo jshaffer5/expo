@@ -217,16 +217,16 @@ static NSString * const sourceScaleKey = @"scale";
     // Define a layer for each visible border. Each layer is masked so that it only
     // shows that edge.
     if (EXImageBorderVisible(borders.top)) {
-      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"top"], borders.top, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationTop)) forKey:@"top"];
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"top"], borders.top, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationTop, borders)) forKey:@"top"];
     }
     if (EXImageBorderVisible(borders.right)) {
-      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"right"], borders.right, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationRight)) forKey:@"right"];
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"right"], borders.right, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationRight, borders)) forKey:@"right"];
     }
     if (EXImageBorderVisible(borders.bottom)) {
-      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"bottom"], borders.bottom, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationBottom)) forKey:@"bottom"];
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"bottom"], borders.bottom, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationBottom, borders)) forKey:@"bottom"];
     }
     if (EXImageBorderVisible(borders.left)) {
-      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"left"], borders.left, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationLeft)) forKey:@"left"];
+      [borderLayers setValue:EXImageBorderShapeLayer(_borderLayers[@"left"], borders.left, bounds, shapeLayerPath, EXImageBorderMask(bounds, EXImageBorderLocationLeft, borders)) forKey:@"left"];
     }
   }
   CGPathRelease(shapeLayerPath);

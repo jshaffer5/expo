@@ -42,7 +42,7 @@ BOOL EXImageBorderEqualTo(EXImageBorder border, EXImageBorder equalTo);
 BOOL EXImageBordersAllEqual(EXImageBorders borders);
 BOOL EXImageBorderVisible(EXImageBorder border);
 void EXImageBordersRelease(EXImageBorders borders);
-CALayer *EXImageBorderMask(CGRect bounds, EXImageBorderLocation location);
+CALayer *EXImageBorderMask(CGRect bounds, EXImageBorderLocation location, EXImageBorders borders);
 CALayer *EXImageBorderSimpleLayer(CALayer *layer, EXImageBorder border, CGRect bounds, CGFloat cornerRadius);
 CALayer *EXImageBorderShapeLayer(CALayer *layer, EXImageBorder border, CGRect bounds, CGPathRef path, CALayer *mask);
 

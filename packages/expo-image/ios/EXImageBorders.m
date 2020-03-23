@@ -98,28 +98,60 @@ BOOL EXImageBorderVisible(EXImageBorder border)
   && (border.style != RCTBorderStyleUnset);
 }
 
-CALayer *EXImageBorderMask(CGRect bounds, EXImageBorderLocation location)
+CALayer *EXImageBorderMask(CGRect bounds, EXImageBorderLocation location, EXImageBorders borders)
 {
   UIBezierPath *path = [UIBezierPath bezierPath];
   switch (location) {
     case EXImageBorderLocationLeft:
       [path moveToPoint:bounds.origin];
+      if (!EXImageBorderVisible(borders.top)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x + borders.left.width, bounds.origin.y)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + borders.left.width, bounds.origin.y + bounds.size.height * 0.5)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.height * 0.5, bounds.origin.y + bounds.size.height * 0.5)];
+      if (!EXImageBorderVisible(borders.bottom)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x + borders.left.width, bounds.origin.y + bounds.size.height * 0.5)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + borders.left.width, bounds.origin.y + bounds.size.height)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height)];
       break;
     case EXImageBorderLocationTop:
       [path moveToPoint:bounds.origin];
+      if (!EXImageBorderVisible(borders.left)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + borders.top.width)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + borders.top.width)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.width * 0.5)];
+      if (!EXImageBorderVisible(borders.right)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + borders.top.width)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + borders.top.width)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y)];
       break;
     case EXImageBorderLocationRight:
       [path moveToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y)];
+      if (!EXImageBorderVisible(borders.top)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - borders.right.width, bounds.origin.y)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - borders.right.width, bounds.size.height * 0.5)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - bounds.size.height * 0.5, bounds.origin.y + bounds.size.height * 0.5)];
+      if (!EXImageBorderVisible(borders.bottom)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - borders.right.width, bounds.size.height * 0.5)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width - borders.right.width, bounds.origin.y + bounds.size.height)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height)];
       break;
     case EXImageBorderLocationBottom:
       [path moveToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height)];
+      if (!EXImageBorderVisible(borders.left)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x, bounds.origin.y + bounds.size.height - borders.bottom.width)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.height - borders.bottom.width)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.height - bounds.size.width * 0.5)];
+      if (!EXImageBorderVisible(borders.right)) {
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width * 0.5, bounds.origin.y + bounds.size.height - borders.bottom.width)];
+        [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height - borders.bottom.width)];
+      }
       [path addLineToPoint:CGPointMake(bounds.origin.x + bounds.size.width, bounds.origin.y + bounds.size.height)];
       break;
   }
