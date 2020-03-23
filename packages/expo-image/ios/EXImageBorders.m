@@ -199,10 +199,10 @@ CALayer *EXImageBorderShapeLayer(CALayer *layer, EXImageBorder border, CGRect bo
   switch (border.style) {
     case RCTBorderStyleDashed:
       shapeLayer.lineCap = kCALineCapSquare;
-      shapeLayer.lineDashPattern = @[@(shapeLayer.lineWidth * 2), @(shapeLayer.lineWidth * 2)];
+      shapeLayer.lineDashPattern = @[@(shapeLayer.lineWidth * 2), @(shapeLayer.lineWidth * 4)];
       break;
     case RCTBorderStyleDotted:
-      shapeLayer.lineCap = kCALineCapRound;
+      shapeLayer.lineCap = kCALineCapSquare;
       shapeLayer.lineDashPattern = @[@0, @(shapeLayer.lineWidth * 2)];
       break;
     default:
