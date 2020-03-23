@@ -80,6 +80,11 @@ static NSString * const sourceScaleKey = @"scale";
   : (UIViewContentMode)resizeMode;
 }
 
+- (void)setBackgroundColor:(UIColor *)backgroundColor
+{
+  _imageView.backgroundColor = backgroundColor;
+}
+
 - (void)didSetProps:(NSArray<NSString *> *)changedProps;
 {
   if (_needsReload) {
