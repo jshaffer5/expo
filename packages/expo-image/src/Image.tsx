@@ -3,7 +3,7 @@ import {
   AccessibilityProps,
   ImageResizeMode,
   ImageSourcePropType,
-  ImageStyle,
+  ImageStyle as RNImageStyle,
   StyleProp,
   StyleSheet,
 } from 'react-native';
@@ -11,6 +11,10 @@ import {
 import ExpoImage from './ExpoImage';
 
 const DEFAULT_RESIZE_MODE = 'cover';
+
+interface ImageStyle extends RNImageStyle {
+  elevation?: number;
+}
 
 export interface ImageProps extends AccessibilityProps {
   // On one hand we want to pass resolved source to native module.
