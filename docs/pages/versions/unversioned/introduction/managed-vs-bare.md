@@ -8,7 +8,7 @@ The two approaches to building applications with Expo tools are called the "mana
 - With the managed workflow you only write JavaScript / TypeScript and Expo tools and services take care of the rest for you.
 - In the bare workflow you have full control over every aspect of the native project, and Expo tools can't help quite as much.
 
-> 💡 **If you've used React Native without any Expo tools** then you have used the "bare workflow", but the name probably doesn't sound familiar. We call this "bare" somewhat in jest and because of the term "bare metal" which and it's easier to talk about something when it has a name. If you have direct access to the native code, it's a bare project. The ["Already used React Native?"](../../workflow/already-used-react-native/) page might be useful for you to quickly understand where Expo fits in.
+> 💡 **If you've used React Native without any Expo tools** then you have used the "bare workflow", but the name probably doesn't sound familiar. We call this "bare" somewhat in jest and because of the term "bare metal" and it's easier to talk about something when it has a name. If you have direct access to the native code, it's a bare project. The ["Already used React Native?"](../../workflow/already-used-react-native/) page might be useful for you to quickly understand where Expo fits in.
 
 ## Managed workflow
 
